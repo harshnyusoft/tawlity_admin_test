@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, Card, Typography, Alert, message } from 'antd';
 import { LockOutlined, SafetyOutlined } from '@ant-design/icons';
+import { changePassword } from '../../api/services/AuthService';
 
 const { Title, Text } = Typography;
 
@@ -11,12 +12,13 @@ const ChangePassword = () => {
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      console.log('Changing password:', values);
-      message.success('Password changed successfully!');
-      form.resetFields();
+      const response = await changePassword(values);
+      if (response.success) {
+        message.success(response.data?.message || 'Password changed successfully!');
+        form.resetFields();
+      } else {
+        message.error(response.error || response.data?.message || 'Failed to change password');
+      }
     } catch (error) {
       message.error('Failed to change password');
     } finally {
@@ -75,7 +77,7 @@ const ChangePassword = () => {
           size="large"
         >
           <Form.Item
-            name="currentPassword"
+            name="current_password"
             label="Current Password"
             rules={[
               { required: true, message: 'Please enter your current password' },
@@ -88,7 +90,7 @@ const ChangePassword = () => {
           </Form.Item>
 
           <Form.Item
-            name="newPassword"
+            name="new_password"
             label="New Password"
             rules={[
               { required: true, message: 'Please enter a new password' },
@@ -136,14 +138,14 @@ const ChangePassword = () => {
           </div>
 
           <Form.Item
-            name="confirmPassword"
+            name="confirm_password"
             label="Confirm New Password"
-            dependencies={['newPassword']}
+            dependencies={['new_password']}
             rules={[
               { required: true, message: 'Please confirm your new password' },
               ({ getFieldValue }) => ({
                 validator(_, value) {
-                  if (!value || getFieldValue('newPassword') === value) {
+                  if (!value || getFieldValue('new_password') === value) {
                     return Promise.resolve();
                   }
                   return Promise.reject(new Error('Passwords do not match!'));

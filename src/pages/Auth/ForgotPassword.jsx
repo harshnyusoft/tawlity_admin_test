@@ -3,6 +3,7 @@ import { Form, Input, Button, Card, Typography, Result, message } from 'antd';
 import { MailOutlined, ArrowLeftOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import FrameLogo from '../../../public/images/Frame.png';
+import { forgotPassword } from '../../api/services/AuthService';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -15,13 +16,15 @@ const ForgotPassword = () => {
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      console.log('Password reset request:', values);
-      setEmail(values.email);
-      setEmailSent(true);
-      message.success('Password reset email sent successfully!');
+      const result = await forgotPassword(values);
+      if (result.success) {
+        setEmail(values.email);
+        setEmailSent(true);
+        message.success(result.data?.message || 'Password reset email sent successfully!');
+        form.resetFields();
+      } else {
+        message.error(result.error || 'Failed to send reset email. Please try again.');
+      }
     } catch (error) {
       message.error('Failed to send reset email. Please try again.');
     } finally {
@@ -59,7 +62,7 @@ const ForgotPassword = () => {
                     <Text strong className="text-blue-600">{email}</Text>
                   </div>
                   <Paragraph className="text-gray-600 text-sm">
-                    Click the link in the email to reset your password. 
+                    Click the link in the email to reset your password.
                     If you don't see the email, check your spam folder.
                   </Paragraph>
                 </div>
@@ -83,10 +86,10 @@ const ForgotPassword = () => {
                 </Button>,
               ]}
             />
-            
+
             <div className="mt-6 pt-6 border-t">
-              <Link 
-                to="/auth/login" 
+              <Link
+                to="/auth/login"
                 className="text-blue-600 hover:text-blue-700 flex items-center justify-center gap-2"
               >
                 <ArrowLeftOutlined />
@@ -151,8 +154,8 @@ const ForgotPassword = () => {
             </Form.Item>
 
             <div className="text-center">
-              <Link 
-                to="/auth/login" 
+              <Link
+                to="/auth/login"
                 className="text-blue-600 hover:text-blue-700 flex items-center justify-center gap-2"
               >
                 <ArrowLeftOutlined />

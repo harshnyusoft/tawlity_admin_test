@@ -3,6 +3,8 @@ import { Form, Input, Button, Card, Typography, Divider, Checkbox, message } fro
 import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import FrameLogo from '../../../public/images/Frame.png';
+import { loginUser } from '../../api/services/AuthService';
+import masterStore from '../../store/masterStore';
 
 const { Title, Text } = Typography;
 
@@ -14,14 +16,22 @@ const Login = () => {
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      console.log('Login attempt:', values);
-      message.success('Login successful!');
-      navigate('/');
+      const result = await loginUser(values);
+      if (result.success) {
+        // Store token and user info in localStorage
+        const { token, ...user } = result.data.data;
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+        // Update global store
+        masterStore.getState().setToken(token);
+        masterStore.getState().setUser(user);
+        message.success('Login successful!');
+        navigate('/');
+      } else {
+        message.error(result.error || 'Invalid credentials. Please try again.');
+      }
     } catch (error) {
-      message.error('Invalid credentials. Please try again.');
+      message.error('Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -81,8 +91,8 @@ const Login = () => {
               <Form.Item name="remember" valuePropName="checked" className="!mb-0">
                 <Checkbox>Remember me</Checkbox>
               </Form.Item>
-              <Link 
-                to="/auth/forgot-password" 
+              <Link
+                to="/auth/forgot-password"
                 className="text-blue-600 hover:text-blue-700 text-sm"
               >
                 Forgot password?
@@ -117,7 +127,7 @@ const Login = () => {
           </Form>
         </Card>
 
-       
+
       </div>
     </div>
   );

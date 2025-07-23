@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Menu, Avatar, Dropdown, Button, Space, Typography } from 'antd';
+import { Layout, Menu, Avatar, Dropdown, Button, Space, Typography, Modal } from 'antd';
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
@@ -13,6 +13,7 @@ import {
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { themeColors } from '../../theme/theme';
 import FrameLogo from '../../../public/images/Frame.png';
+import masterStore from '../../store/masterStore';
 
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
@@ -22,6 +23,8 @@ const AppLayout = () => {
   const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  const currentUser = masterStore((state) => state.user)
 
   // Handle responsive behavior
   useEffect(() => {
@@ -84,8 +87,18 @@ const AppLayout = () => {
       icon: <LogoutOutlined />,
       label: 'Logout',
       onClick: () => {
-        // Handle logout logic here
-        console.log('Logging out...');
+        Modal.confirm({
+          title: 'Are you sure you want to logout?',
+          okText: 'Yes',
+          cancelText: 'No',
+          onOk: () => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            masterStore.getState().clearToken();
+            masterStore.getState().clearUser();
+            navigate('/auth/login');
+          },
+        });
       },
     },
   ];
@@ -97,6 +110,8 @@ const AppLayout = () => {
       setCollapsed(true);
     }
   };
+
+  const fullName = ` ${currentUser?.first_name || ''} ${currentUser?.last_name || ''}`.trim() || 'John Doe'; ``
 
   return (
     <Layout className="min-h-screen">
@@ -170,7 +185,7 @@ const AppLayout = () => {
           />
 
           <Space className="hidden sm:flex">
-            <Text strong className="hidden md:inline">Welcome back, John Doe</Text>
+            <Text strong className="hidden md:inline">Welcome back, {fullName}</Text>
             <Dropdown
               menu={{ items: userMenuItems }}
               placement="bottomRight"
@@ -183,7 +198,7 @@ const AppLayout = () => {
                   icon={<UserOutlined />}
                   className="sm:w-8 sm:h-8"
                 />
-                <Text className="hidden sm:inline">John Doe</Text>
+                <Text className="hidden sm:inline">{fullName}</Text>
               </Button>
             </Dropdown>
           </Space>

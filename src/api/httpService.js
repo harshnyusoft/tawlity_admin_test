@@ -15,7 +15,9 @@ const httpService = {
         axiosInstance.patch(url, data, config),
 
     delete: (url, config = {}) =>
-        axiosInstance.delete(url, config),
+        axiosInstance.delete(url, {
+            data: config
+        }),
 };
 
 export default httpService;

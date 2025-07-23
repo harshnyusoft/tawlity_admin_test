@@ -3,6 +3,7 @@ import { Form, Input, Button, Card, Typography, Result, Progress, message } from
 import { LockOutlined, CheckCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import FrameLogo from '../../../public/images/Frame.png';
+import { resetPassword } from '../../api/services/AuthService';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -69,12 +70,18 @@ const ResetPassword = () => {
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      console.log('Password reset:', { token, ...values });
-      setResetSuccess(true);
-      message.success('Password reset successfully!');
+      const payload = {
+        token,
+        password: values.password,
+        confirm_password: values.confirmPassword,
+      };
+      const result = await resetPassword(payload);
+      if (result.success) {
+        setResetSuccess(true);
+        message.success(result.data?.message || 'Password reset successfully!');
+      } else {
+        message.error(result.error || 'Failed to reset password. Please try again.');
+      }
     } catch (error) {
       message.error('Failed to reset password. Please try again.');
     } finally {

@@ -6,6 +6,7 @@ const axiosInstance = axios.create({
     baseURL: getConfig().API_BASE_URL,
     headers: {
         'Content-Type': 'application/json',
+        'api-key': getConfig().API_KEY,
     },
 });
 
@@ -26,8 +27,8 @@ axiosInstance.interceptors.response.use(
         // Global error handling
         if (error.response?.status === 401) {
             // handle unauthorized access
-            localStorage.clear();
-            window.location.href = '/login';
+            // localStorage.clear();
+            // window.location.href = '/auth/login';
         }
         return Promise.reject(error);
     }

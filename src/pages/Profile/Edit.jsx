@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, Card, Typography, Row, Col, Upload, Avatar, message } from 'antd';
 import { UserOutlined, UploadOutlined, SaveOutlined } from '@ant-design/icons';
+import { editProfile } from '../../api/services/AuthService';
+import masterStore from '../../store/masterStore';
 
 const { Title } = Typography;
 
@@ -9,25 +11,23 @@ const EditProfile = () => {
   const [loading, setLoading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState('');
 
-  // Initialize form with current user data
-  const currentUser = {
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    phone: '+1 234 567 8900',
-    bio: 'Software engineer with 5+ years of experience in web development.',
-    company: 'Tech Corp',
-    website: 'https://johndoe.dev',
-  };
+
+  const currentUser = masterStore((state) => state.user)
+
 
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      console.log('Updating profile:', values);
-      message.success('Profile updated successfully!');
+      const response = await editProfile(values);
+      if (response.success) {
+        if (response.data) {
+          masterStore.getState().setUser(response.data?.data);
+          localStorage.setItem('user', JSON.stringify(response.data?.data));
+        }
+        message.success('Profile updated successfully!');
+      } else {
+        message.error(response.error || 'Failed to update profile');
+      }
     } catch (error) {
       message.error('Failed to update profile');
     } finally {
@@ -61,7 +61,7 @@ const EditProfile = () => {
       {/* Header */}
       <div>
         <Title level={2}>Edit Profile</Title>
-        <div className="text-gray-500">Update your personal information and settings</div>
+        <div className="text-gray-500">Update your personal information</div>
       </div>
 
       {/* Form */}
@@ -72,7 +72,7 @@ const EditProfile = () => {
           onFinish={handleSubmit}
           initialValues={currentUser}
           size="large"
-          className="max-w-4xl"
+          className="max-w-2xl"
         >
           <Row gutter={24}>
             {/* Avatar Section */}
@@ -80,31 +80,16 @@ const EditProfile = () => {
               <div className="flex flex-col items-center gap-4">
                 <Avatar
                   size={120}
-                  src={avatarUrl}
                   icon={<UserOutlined />}
                   className="border-4 border-gray-200"
                 />
-                <Upload
-                  name="avatar"
-                  showUploadList={false}
-                  beforeUpload={beforeUpload}
-                  onChange={handleAvatarChange}
-                >
-                  <Button icon={<UploadOutlined />}>Change Avatar</Button>
-                </Upload>
               </div>
             </Col>
 
             {/* Basic Information */}
-            <Col xs={24}>
-              <div className="mb-6">
-                <Title level={4}>Basic Information</Title>
-              </div>
-            </Col>
-
             <Col xs={24} sm={12}>
               <Form.Item
-                name="firstName"
+                name="first_name"
                 label="First Name"
                 rules={[
                   { required: true, message: 'Please enter your first name' },
@@ -117,7 +102,7 @@ const EditProfile = () => {
 
             <Col xs={24} sm={12}>
               <Form.Item
-                name="lastName"
+                name="last_name"
                 label="Last Name"
                 rules={[
                   { required: true, message: 'Please enter your last name' },
@@ -128,7 +113,7 @@ const EditProfile = () => {
               </Form.Item>
             </Col>
 
-            <Col xs={24} sm={12}>
+            <Col xs={24}>
               <Form.Item
                 name="email"
                 label="Email Address"
@@ -138,63 +123,6 @@ const EditProfile = () => {
                 ]}
               >
                 <Input placeholder="Enter your email address" />
-              </Form.Item>
-            </Col>
-
-            <Col xs={24} sm={12}>
-              <Form.Item
-                name="phone"
-                label="Phone Number"
-                rules={[
-                  { required: true, message: 'Please enter your phone number' },
-                ]}
-              >
-                <Input placeholder="Enter your phone number" />
-              </Form.Item>
-            </Col>
-
-            {/* Professional Information */}
-            <Col xs={24}>
-              <div className="mb-6 mt-6">
-                <Title level={4}>Professional Information</Title>
-              </div>
-            </Col>
-
-            <Col xs={24}>
-              <Form.Item
-                name="bio"
-                label="Bio"
-                rules={[
-                  { max: 500, message: 'Bio cannot exceed 500 characters' },
-                ]}
-              >
-                <Input.TextArea
-                  rows={4}
-                  placeholder="Tell us about yourself..."
-                  showCount
-                  maxLength={500}
-                />
-              </Form.Item>
-            </Col>
-
-            <Col xs={24} sm={12}>
-              <Form.Item
-                name="company"
-                label="Company"
-              >
-                <Input placeholder="Enter your company name" />
-              </Form.Item>
-            </Col>
-
-            <Col xs={24} sm={12}>
-              <Form.Item
-                name="website"
-                label="Website"
-                rules={[
-                  { type: 'url', message: 'Please enter a valid URL' },
-                ]}
-              >
-                <Input placeholder="https://yourwebsite.com" />
               </Form.Item>
             </Col>
 
