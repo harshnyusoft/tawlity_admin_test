@@ -55,6 +55,10 @@ const UserList = () => {
     navigate(`/user-management/edit/${user?.id}`, { state: { user } });
   };
 
+  const handleView = (user) => {
+    navigate(`/user-management/view/${user?.id}`, { state: { user } });
+  };
+
   const columns = [
     {
       title: 'Full Name',

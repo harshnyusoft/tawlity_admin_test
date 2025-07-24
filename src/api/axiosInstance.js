@@ -27,8 +27,8 @@ axiosInstance.interceptors.response.use(
         // Global error handling
         if (error.response?.status === 401) {
             // handle unauthorized access
-            // localStorage.clear();
-            // window.location.href = '/auth/login';
+            localStorage.clear();
+            window.location.href = '/auth/login';
         }
         return Promise.reject(error);
     }

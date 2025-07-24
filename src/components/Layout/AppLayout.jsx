@@ -57,10 +57,6 @@ const AppLayout = () => {
           key: '/user-management/list',
           label: 'User List',
         },
-        {
-          key: '/user-management/create',
-          label: 'Add User',
-        },
       ],
     },
   ];

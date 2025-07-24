@@ -13,6 +13,7 @@ import ResetPassword from './pages/Auth/ResetPassword';
 import { Toaster } from 'react-hot-toast';
 import PrivateRoute from './components/PrivateRoute';
 import EditUser from './pages/UserManagement/Edit';
+import UserDetails from './pages/UserManagement/View';
 
 function App() {
 
@@ -34,6 +35,7 @@ function App() {
                 <Route path="user-management">
                   <Route path="list" element={<UserList />} />
                   <Route path="edit/:id" element={<EditUser />} />
+                  <Route path="view/:id" element={<UserDetails />} />
                 </Route>
                 <Route path="profile">
                   <Route path="edit" element={<EditProfile />} />

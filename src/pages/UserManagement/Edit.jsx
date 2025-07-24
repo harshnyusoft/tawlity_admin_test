@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Select, Card, Typography, Row, Col, Upload, Avatar, message } from 'antd';
 import { UserOutlined, UploadOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Autocomplete, LoadScript } from '@react-google-maps/api';
+import { Autocomplete } from '@react-google-maps/api';
 import { useRef } from 'react';
 import { getConfig } from '../../utils/config';
 import { editUser } from '../../api/services/UserService';
@@ -94,48 +94,53 @@ const EditUser = () => {
   };
 
   // Add back avatar upload logic
-  const handleAvatarChange = (info) => {
-    if (info.file.status === 'uploading') {
-      return;
-    }
-    if (info.file.status === 'done') {
-      // If your upload returns a file object, use it. Otherwise, use originFileObj
-      setAvatarFile(info.file.originFileObj || null);
-      // Optionally update preview
-      if (info.file.response?.url) {
-        setAvatarUrl(info.file.response.url);
-      } else {
-        // For preview, create a local URL
-        setAvatarUrl(info.file.originFileObj ? URL.createObjectURL(info.file.originFileObj) : '');
-      }
-    }
-  };
-
   const beforeUpload = (file) => {
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
     if (!isJpgOrPng) {
       message.error('You can only upload JPG/PNG file!');
     }
-    const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isLt2M) {
-      message.error('Image must smaller than 2MB!');
+    const isLt15M = file.size / 1024 / 1024 < 15;
+    if (!isLt15M) {
+      message.error('Image must smaller than 15MB!');
     }
-    return isJpgOrPng && isLt2M;
+    if (isJpgOrPng && isLt15M) {
+      setAvatarFile(file); // Set the file for API
+      setAvatarUrl(URL.createObjectURL(file)); // Update preview immediately
+    }
+    return false; // Prevent auto-upload
+  };
+
+  // handleAvatarChange is not needed for file state, but can be used for fallback preview if needed
+  const handleAvatarChange = (info) => {
+    // No-op or fallback preview logic if needed
   };
 
   const handlePlaceChanged = () => {
     if (autocompleteRef.current) {
       const place = autocompleteRef.current.getPlace();
       const addressComponents = place.address_components || [];
-      const getComponent = (type) =>
-        addressComponents.find((comp) => comp.types.includes(type))?.long_name || '';
+      const getComponent = (types) => {
+        if (!Array.isArray(types)) types = [types];
+        const match = addressComponents.find((comp) =>
+          comp.types.some((type) => types.includes(type))
+        );
+        return match?.long_name?.trim() || null;
+      };
+
+      const stateComponent = getComponent([
+        'administrative_area_level_1',
+        'administrative_area_level_2',
+        'sublocality',
+        'locality',
+      ]);
+
 
       setAddressFields({
         address: place.formatted_address || '',
         city: getComponent('locality') || getComponent('sublocality_level_1') || getComponent('administrative_area_level_2'),
-        state: getComponent('administrative_area_level_1'),
+        state: stateComponent || 'N/A',
         country: getComponent('country'),
-        postal_code: getComponent('postal_code'),
+        postal_code: getComponent('postal_code') || 'N/A',
         latitude: place.geometry?.location?.lat() || '',
         longitude: place.geometry?.location?.lng() || '',
       });
@@ -260,22 +265,16 @@ const EditUser = () => {
 
             <Col xs={24} sm={24}>
               <Form.Item label="Address">
-                <LoadScript
-                  googleMapsApiKey={getConfig().GOOGLE_API_KEY}
-                  libraries={['places']} // this is required for autocomplete
+                <Autocomplete
+                  onLoad={(autocomplete) => (autocompleteRef.current = autocomplete)}
+                  onPlaceChanged={handlePlaceChanged}
                 >
-
-                  <Autocomplete
-                    onLoad={(autocomplete) => (autocompleteRef.current = autocomplete)}
-                    onPlaceChanged={handlePlaceChanged}
-                  >
-                    <Input
-                      value={addressFields.address}
-                      onChange={(e) => setAddressFields({ ...addressFields, address: e.target.value })}
-                      placeholder="Start typing address"
-                    />
-                  </Autocomplete>
-                </LoadScript>
+                  <Input
+                    value={addressFields.address}
+                    onChange={(e) => setAddressFields({ ...addressFields, address: e.target.value })}
+                    placeholder="Start typing address"
+                  />
+                </Autocomplete>
               </Form.Item>
 
             </Col>
