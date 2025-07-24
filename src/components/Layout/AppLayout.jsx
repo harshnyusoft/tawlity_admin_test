@@ -11,9 +11,12 @@ import {
   SettingOutlined,
 } from '@ant-design/icons';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { themeColors } from '../../theme/theme';
 import FrameLogo from '../../../public/images/Frame.png';
 import masterStore from '../../store/masterStore';
+import LanguageSwitcher from '../LanguageSwitcher';
+import useDirection from '../../hooks/useDirection';
 
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
@@ -23,6 +26,8 @@ const AppLayout = () => {
   const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
+  const { isRTL } = useDirection();
 
   const currentUser = masterStore((state) => state.user)
 
@@ -46,16 +51,16 @@ const AppLayout = () => {
     {
       key: '/',
       icon: <DashboardOutlined />,
-      label: 'Dashboard',
+      label: t('navigation.dashboard'),
     },
     {
       key: '/user-management',
       icon: <UserOutlined />,
-      label: 'User Management',
+      label: t('navigation.userManagement'),
       children: [
         {
           key: '/user-management/list',
-          label: 'User List',
+          label: t('navigation.userList'),
         },
       ],
     },
@@ -66,13 +71,13 @@ const AppLayout = () => {
     {
       key: 'edit-profile',
       icon: <EditOutlined />,
-      label: 'Edit Profile',
+      label: t('navigation.editProfile'),
       onClick: () => navigate('/profile/edit'),
     },
     {
       key: 'change-password',
       icon: <LockOutlined />,
-      label: 'Change Password',
+      label: t('navigation.changePassword'),
       onClick: () => navigate('/profile/change-password'),
     },
     {
@@ -81,12 +86,12 @@ const AppLayout = () => {
     {
       key: 'logout',
       icon: <LogoutOutlined />,
-      label: 'Logout',
+      label: t('common.logout'),
       onClick: () => {
         Modal.confirm({
-          title: 'Are you sure you want to logout?',
-          okText: 'Yes',
-          cancelText: 'No',
+          title: t('messages.confirmLogout'),
+          okText: t('common.yes'),
+          cancelText: t('common.no'),
           onOk: () => {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
@@ -121,7 +126,8 @@ const AppLayout = () => {
           background: themeColors.sidebarBg,
           position: 'fixed', // Always fixed
           minHeight: '100vh',
-          left: 0,
+          left: isRTL ? 'auto' : 0,
+          right: isRTL ? 0 : 'auto',
           top: 0,
           bottom: 0,
           zIndex: isMobile ? 1001 : 'auto',
@@ -154,8 +160,9 @@ const AppLayout = () => {
       {/* Main layout shifted right to make space for fixed sidebar */}
       <Layout
         style={{
-          marginLeft: isMobile ? 0 : (collapsed ? 64 : 256),
-          transition: 'margin-left 0.2s',
+          marginLeft: isMobile ? 0 : (isRTL ? 0 : (collapsed ? 64 : 256)),
+          marginRight: isMobile ? 0 : (isRTL ? (collapsed ? 64 : 256) : 0),
+          transition: 'margin 0.2s',
         }}
       >
         <Header
@@ -180,8 +187,9 @@ const AppLayout = () => {
             }}
           />
 
-          <Space className="hidden sm:flex">
-            <Text strong className="hidden md:inline">Welcome back, {fullName}</Text>
+          <Space className="hidden sm:flex" direction={isRTL ? 'rtl' : 'ltr'}>
+            <LanguageSwitcher size="small" />
+            <Text strong className="hidden md:inline">{t('common.welcome')} {fullName}</Text>
             <Dropdown
               menu={{ items: userMenuItems }}
               placement="bottomRight"
@@ -201,6 +209,8 @@ const AppLayout = () => {
 
           {/* Mobile User Menu */}
           <div className="sm:hidden">
+            <Space size="small">
+              <LanguageSwitcher size="small" showIcon={false} />
             <Dropdown
               menu={{ items: userMenuItems }}
               placement="bottomRight"
@@ -214,6 +224,7 @@ const AppLayout = () => {
                 />
               </Button>
             </Dropdown>
+            </Space>
           </div>
         </Header>
 

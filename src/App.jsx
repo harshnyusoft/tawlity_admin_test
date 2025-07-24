@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { App as AntdApp, ConfigProvider } from 'antd';
+import { useTranslation } from 'react-i18next';
+import { useEffect } from 'react';
 import { getAntdTheme } from './theme/theme';
 import AppLayout from './components/Layout/AppLayout';
 import Dashboard from './pages/Dashboard';
@@ -14,11 +16,20 @@ import { Toaster } from 'react-hot-toast';
 import PrivateRoute from './components/PrivateRoute';
 import EditUser from './pages/UserManagement/Edit';
 import UserDetails from './pages/UserManagement/View';
+import useDirection from './hooks/useDirection';
 
 function App() {
+  const { i18n } = useTranslation();
+  const { direction, isRTL } = useDirection();
+
+  // Configure Ant Design for RTL
+  const antdConfig = {
+    ...getAntdTheme(),
+    direction: direction,
+  };
 
   return (
-    <ConfigProvider theme={getAntdTheme()}>
+    <ConfigProvider theme={antdConfig} direction={direction}>
       <AntdApp>
         <Router>
           <Routes>

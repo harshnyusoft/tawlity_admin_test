@@ -9,34 +9,37 @@ import {
   ArrowDownOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 const { Title, Text } = Typography;
 
 const Dashboard = () => {
+  const { t } = useTranslation();
+
   const stats = [
     {
-      title: 'Total Users',
+      title: t('dashboard.totalUsers'),
       value: 1128,
       prefix: <UserOutlined />,
       suffix: <ArrowUpOutlined style={{ color: '#3f8600' }} />,
       valueStyle: { color: '#3f8600' },
     },
     {
-      title: 'Active Sessions',
+      title: t('dashboard.activeSessions'),
       value: 893,
       prefix: <TeamOutlined />,
       suffix: <ArrowUpOutlined style={{ color: '#3f8600' }} />,
       valueStyle: { color: '#3f8600' },
     },
     {
-      title: 'Orders',
+      title: t('dashboard.orders'),
       value: 234,
       prefix: <ShoppingCartOutlined />,
       suffix: <ArrowDownOutlined style={{ color: '#cf1322' }} />,
       valueStyle: { color: '#cf1322' },
     },
     {
-      title: 'Revenue',
+      title: t('dashboard.revenue'),
       value: 11280,
       prefix: <DollarOutlined />,
       suffix: <ArrowUpOutlined style={{ color: '#3f8600' }} />,
@@ -49,9 +52,9 @@ const Dashboard = () => {
     <div className="space-y-6">
       {/* Welcome Section */}
       <div className="mb-4 sm:mb-6">
-        <Title level={2} className="!mb-2">Dashboard</Title>
+        <Title level={2} className="!mb-2">{t('dashboard.title')}</Title>
         <Text type="secondary" className="text-sm sm:text-base">
-          Welcome to your admin dashboard. Here's an overview of your system.
+          {t('dashboard.welcomeMessage')}
         </Text>
       </div>
 
@@ -77,68 +80,68 @@ const Dashboard = () => {
       {/* Quick Actions */}
       <Row gutter={[12, 12]}>
         <Col xs={24} lg={14} xl={16}>
-          <Card title="Recent Activity" className="h-full">
+          <Card title={t('dashboard.recentActivity')} className="h-full">
             <div className="space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gray-50 rounded gap-2">
                 <Space className="flex-1">
                   <UserOutlined className="text-blue-500" />
                   <div>
-                    <Text strong className="text-sm sm:text-base">New user registered</Text>
+                    <Text strong className="text-sm sm:text-base">{t('dashboard.newUserRegistered')}</Text>
                     <div>
                       <Text type="secondary" className="text-xs sm:text-sm break-all">sarah.wilson@example.com</Text>
                     </div>
                   </div>
                 </Space>
-                <Text type="secondary" className="text-xs sm:text-sm whitespace-nowrap">2 min ago</Text>
+                <Text type="secondary" className="text-xs sm:text-sm whitespace-nowrap">2 {t('dashboard.minAgo')}</Text>
               </div>
               
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gray-50 rounded gap-2">
                 <Space className="flex-1">
                   <ShoppingCartOutlined className="text-green-500" />
                   <div>
-                    <Text strong className="text-sm sm:text-base">Order completed</Text>
+                    <Text strong className="text-sm sm:text-base">{t('dashboard.orderCompleted')}</Text>
                     <div>
                       <Text type="secondary" className="text-xs sm:text-sm">Order #12345</Text>
                     </div>
                   </div>
                 </Space>
-                <Text type="secondary" className="text-xs sm:text-sm whitespace-nowrap">15 min ago</Text>
+                <Text type="secondary" className="text-xs sm:text-sm whitespace-nowrap">15 {t('dashboard.minAgo')}</Text>
               </div>
               
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-gray-50 rounded gap-2">
                 <Space className="flex-1">
                   <TeamOutlined className="text-purple-500" />
                   <div>
-                    <Text strong className="text-sm sm:text-base">User updated profile</Text>
+                    <Text strong className="text-sm sm:text-base">{t('dashboard.userUpdatedProfile')}</Text>
                     <div>
                       <Text type="secondary" className="text-xs sm:text-sm break-all">john.doe@example.com</Text>
                     </div>
                   </div>
                 </Space>
-                <Text type="secondary" className="text-xs sm:text-sm whitespace-nowrap">1 hr ago</Text>
+                <Text type="secondary" className="text-xs sm:text-sm whitespace-nowrap">1 {t('dashboard.hrAgo')}</Text>
               </div>
             </div>
           </Card>
         </Col>
 
         <Col xs={24} lg={10} xl={8}>
-          <Card title="Quick Actions" className="h-full">
+          <Card title={t('dashboard.quickActions')} className="h-full">
             <div className="grid grid-cols-1 gap-3">
               <Button type="primary" block size="large" className="h-12">
                 <UserOutlined />
-                <span className="ml-2">Add New User</span>
+                <span className="ml-2">{t('dashboard.addNewUser')}</span>
               </Button>
               <Button block size="large" className="h-12">
                 <TeamOutlined />
-                <span className="ml-2">Manage Roles</span>
+                <span className="ml-2">{t('dashboard.manageRoles')}</span>
               </Button>
               <Button block size="large" className="h-12">
                 <ShoppingCartOutlined />
-                <span className="ml-2">View Orders</span>
+                <span className="ml-2">{t('dashboard.viewOrders')}</span>
               </Button>
               <Button block size="large" className="h-12">
                 <PlusOutlined />
-                <span className="ml-2">Generate Report</span>
+                <span className="ml-2">{t('dashboard.generateReport')}</span>
               </Button>
             </div>
           </Card>
@@ -146,27 +149,27 @@ const Dashboard = () => {
       </Row>
 
       {/* System Status */}
-      <Card title="System Status" className="mt-4 sm:mt-6">
+      <Card title={t('dashboard.systemStatus')} className="mt-4 sm:mt-6">
         <Row gutter={[12, 12]}>
           <Col xs={24} sm={8} className="mb-4 sm:mb-0">
             <div className="text-center p-3 sm:p-4">
               <div className="w-3 h-3 bg-green-500 rounded-full mx-auto mb-2 sm:mb-3"></div>
-              <Text strong className="text-sm sm:text-base">Database</Text>
-              <div><Text type="secondary" className="text-xs sm:text-sm">Operational</Text></div>
+              <Text strong className="text-sm sm:text-base">{t('dashboard.database')}</Text>
+              <div><Text type="secondary" className="text-xs sm:text-sm">{t('dashboard.operational')}</Text></div>
             </div>
           </Col>
           <Col xs={24} sm={8} className="mb-4 sm:mb-0">
             <div className="text-center p-3 sm:p-4">
               <div className="w-3 h-3 bg-green-500 rounded-full mx-auto mb-2 sm:mb-3"></div>
-              <Text strong className="text-sm sm:text-base">API Server</Text>
-              <div><Text type="secondary" className="text-xs sm:text-sm">Operational</Text></div>
+              <Text strong className="text-sm sm:text-base">{t('dashboard.apiServer')}</Text>
+              <div><Text type="secondary" className="text-xs sm:text-sm">{t('dashboard.operational')}</Text></div>
             </div>
           </Col>
           <Col xs={24} sm={8}>
             <div className="text-center p-3 sm:p-4">
               <div className="w-3 h-3 bg-yellow-500 rounded-full mx-auto mb-2 sm:mb-3"></div>
-              <Text strong className="text-sm sm:text-base">Cache Server</Text>
-              <div><Text type="secondary" className="text-xs sm:text-sm">Maintenance</Text></div>
+              <Text strong className="text-sm sm:text-base">{t('dashboard.cacheServer')}</Text>
+              <div><Text type="secondary" className="text-xs sm:text-sm">{t('dashboard.maintenance')}</Text></div>
             </div>
           </Col>
         </Row>

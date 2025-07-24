@@ -11,6 +11,7 @@ import {
   EyeOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { getUserList, blockUnblockUser, removeUser } from '../../api/services/UserService';
 import useDebounce from '../../hooks/useDebounce';
 
@@ -19,6 +20,7 @@ const { Title } = Typography;
 
 const UserList = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [searchText, setSearchText] = useState('');
   const debouncedSearch = useDebounce(searchText, 500);
   const [loading, setLoading] = useState(false);
@@ -61,7 +63,7 @@ const UserList = () => {
 
   const columns = [
     {
-      title: 'Full Name',
+      title: t('userManagement.fullName'),
       dataIndex: 'full_name',
       key: 'full_name',
       render: (text, record) => (
@@ -84,14 +86,14 @@ const UserList = () => {
       responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
     },
     {
-      title: 'Gender',
+      title: t('userManagement.gender'),
       dataIndex: 'gender',
       key: 'gender',
       render: (gender) => gender ? gender.charAt(0) + gender.slice(1).toLowerCase() : '-',
       responsive: ['sm', 'md', 'lg', 'xl'],
     },
     {
-      title: 'Address',
+      title: t('userManagement.address'),
       dataIndex: 'address',
       key: 'address',
       render: (_, record) => (
@@ -100,42 +102,42 @@ const UserList = () => {
       responsive: ['md', 'lg', 'xl'],
     },
     {
-      title: 'No. of Bookings',
+      title: t('userManagement.bookings'),
       dataIndex: ['_count', 'bookings'],
       key: 'bookings',
       render: (_, record) => record._count?.bookings ?? 0,
       responsive: ['md', 'lg', 'xl'],
     },
     {
-      title: 'Status',
+      title: t('userManagement.status'),
       dataIndex: 'is_active',
       key: 'is_active',
       render: (is_active) => (
         <Tag color={is_active ? 'success' : 'default'}>
-          {is_active ? 'Active' : 'Inactive'}
+          {is_active ? t('common.active') : t('common.inactive')}
         </Tag>
       ),
       responsive: ['sm', 'md', 'lg', 'xl'],
     },
     {
-      title: 'Verified',
+      title: t('userManagement.verified'),
       dataIndex: 'is_verify',
       key: 'is_verify',
       render: (is_verify) => (
         <Tag color={is_verify ? 'blue' : 'default'}>
-          {is_verify ? 'Verified' : 'Not Verified'}
+          {is_verify ? t('common.verified') : t('common.notVerified')}
         </Tag>
       ),
       responsive: ['md', 'lg', 'xl'],
     },
     {
-      title: 'Joining Date',
+      title: t('userManagement.joiningDate'),
       dataIndex: 'joining_date',
       key: 'joining_date',
       responsive: ['lg', 'xl'],
     },
     {
-      title: 'Actions',
+      title: t('userManagement.actions'),
       key: 'actions',
       align: 'center',
       render: (_, record) => (
@@ -146,7 +148,7 @@ const UserList = () => {
             onClick={() => handleView(record)}
             size="small"
           >
-            View
+            {t('common.view')}
           </Button>
 
           <Button
@@ -155,29 +157,29 @@ const UserList = () => {
             onClick={() => handleEdit(record)}
             size="small"
           >
-            Edit
+            {t('common.edit')}
           </Button>
           <Popconfirm
-            title={record.is_active ? 'Deactivate user' : 'Activate user'}
-            description={`Are you sure you want to ${record.is_active ? 'deactivate' : 'activate'} this user?`}
+            title={record.is_active ? t('userManagement.deactivateUser') : t('userManagement.activateUser')}
+            description={record.is_active ? t('userManagement.confirmDeactivate') : t('userManagement.confirmActivate')}
             onConfirm={() => handleDeactivate(record)}
-            okText="Yes"
-            cancelText="No"
+            okText={t('common.yes')}
+            cancelText={t('common.no')}
           >
             <Button
               type="text"
               danger={record.is_active}
               size="small"
             >
-              {record.is_active ? 'Deactivate' : 'Activate'}
+              {record.is_active ? t('userManagement.deactivate') : t('userManagement.activate')}
             </Button>
           </Popconfirm>
           <Popconfirm
-            title="Delete user"
-            description="Are you sure you want to delete this user?"
+            title={t('userManagement.deleteUser')}
+            description={t('userManagement.confirmDelete')}
             onConfirm={() => handleDelete(record.id)}
-            okText="Yes"
-            cancelText="No"
+            okText={t('common.yes')}
+            cancelText={t('common.no')}
           >
             <Button
               type="text"
@@ -185,7 +187,7 @@ const UserList = () => {
               danger
               size="small"
             >
-              Remove
+              {t('userManagement.remove')}
             </Button>
           </Popconfirm>
         </Space>
@@ -202,13 +204,13 @@ const UserList = () => {
       const response = await blockUnblockUser({ userId: user.id, isActive: !user.is_active });
       if (response.success) {
         await fetchUserList();
-        message.success(`${user.is_active ? 'Deactivated' : 'Activated'} user: ${user.full_name}`);
+        message.success(`${user.is_active ? t('userManagement.userDeactivated') : t('userManagement.userActivated')}: ${user.full_name}`);
 
       } else {
-        message.error(response.error || 'Failed to update user status');
+        message.error(response.error || t('messages.failedToUpdate'));
       }
     } catch (error) {
-      message.error('Failed to update user status');
+      message.error(t('messages.failedToUpdate'));
     } finally {
       setLoading(false);
     }
@@ -255,8 +257,8 @@ const UserList = () => {
       {/* Admin description */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4 sm:mb-6">
         <div>
-          <Title level={2} className="!mb-1 sm:!mb-2">User Management</Title>
-          <div className="text-gray-500 text-sm sm:text-base">Manage and monitor user accounts</div>
+          <Title level={2} className="!mb-1 sm:!mb-2">{t('userManagement.title')}</Title>
+          <div className="text-gray-500 text-sm sm:text-base">{t('userManagement.description')}</div>
         </div>
 
       </div>
@@ -265,7 +267,7 @@ const UserList = () => {
       <Card>
         <div className="flex flex-col gap-3 sm:gap-4">
           <Search
-            placeholder="Search users..."
+            placeholder={t('userManagement.searchUsers')}
             allowClear
             enterButton={<SearchOutlined />}
             size="large"
@@ -290,7 +292,7 @@ const UserList = () => {
             showSizeChanger: true,
             showQuickJumper: true,
             showTotal: (total, range) =>
-              `${range[0]}-${range[1]} of ${total} users`,
+              `${range[0]}-${range[1]} ${t('common.of')} ${total} ${t('common.users')}`,
             responsive: true,
           }}
           onChange={handleTableChange}
